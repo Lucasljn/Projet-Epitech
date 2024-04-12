@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+import sys
+import math
+import csv
+from math import *
+
+def error():
+    fun = ["EXP", "COS", "SIN", "COSH", "SINH"]
+    intfun = 0
+
+    if (len(sys.argv) <= 2):
+        sys.exit(84)
+    for i in range(len(fun)):
+        if (fun[i] == sys.argv[1]):
+            intfun = 1
+    if (intfun != 1):
+        sys.exit(84)
+    for i in range(2, len(sys.argv)):
+        try:
+            sys.argv[i] = (int)(sys.argv[i])
+        except:
+            sys.exit(84)
+    for i in range(len(sys.argv)):
+        if (i * i == len(sys.argv) - 2):
+            return i
+    sys.exit(84)
+
+def matrix_multiplication(key, message, len_matrix):
+    matrix_final = [[0 for i in range(len_matrix)] for j in range(len_matrix)]
+    for i in range(len_matrix):
+        for j in range(len_matrix):
+            for k in range(len_matrix):
+                matrix_final[i][j] += message[i][k] * key[k][j]
+    return matrix_final
+
+def matrix_identity(len_matrix):
+    matrice = [[0 for _ in range(len_matrix)] for _ in range(len_matrix)]
+    matrice2 = [[0 for _ in range(len_matrix)] for _ in range(len_matrix)]
+    identity = [[0 for _ in range(len_matrix)] for _ in range(len_matrix)]
+    k = 2
+    place_one = 0
+    for i in range(len(matrice)):
+        for j in range(len(matrice)):
+            matrice[i][j] = (float)(sys.argv[k])
+            matrice2[i][j] = (float)(sys.argv[k])
+            if (j == place_one):
+                identity[i][j] = 1
+            else:
+                identity[i][j] = 0
+            k += 1
+        place_one += 1
+    return matrice, identity, matrice2
+
+def plus_matrix(matrix1, matrix2):
+    matrice_final = [[0 for _ in range(len(matrix1))] for _ in range(len(matrix1))]
+    for i in range(len(matrix1)):
+        for j in range(len(matrix1)):
+            matrice_final[i][j] = matrix1[i][j] + matrix2[i][j]
+    return matrice_final
+
+def moins_matrix(matrix1, matrix2):
+    matrice_final = [[0 for _ in range(len(matrix1))] for _ in range(len(matrix1))]
+    for i in range(len(matrix1)):
+        for j in range(len(matrix1)):
+            matrice_final[i][j] = matrix2[i][j] - matrix1[i][j]
+    return matrice_final
+
+def divise_matrix(divise, matrix):
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            matrix[i][j] /= divise
+    return matrix
+
+def mult_matrix(mult, matrix):
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            matrix[i][j] *= mult
+    return matrix
+
+def expo_function(len_matrix, matrice, matrice2, identity):
+    matrice_final = plus_matrix(matrice, identity)
+    for i in range(2, 50):
+        j = 1
+        while j < i:
+            matrice2 = matrix_multiplication(matrice2, matrice, len_matrix)
+            j += 1
+        matrice_final = plus_matrix(matrice_final, divise_matrix((factorial(i)), matrice2))
+        matrice, identity, matrice2 = matrix_identity(len_matrix)
+    return matrice_final
+
+def cosh_function(len_matrix, matrice, matrice2, identity):
+    matrice_final = plus_matrix(divise_matrix(2, matrix_multiplication(matrice, matrice, len_matrix)), identity)
+    for i in range(2, 80):
+        j = 2
+        while j <= 2 * i:
+            matrice2 = matrix_multiplication(matrice2, matrice, len_matrix)
+            j += 1
+        matrice_final = plus_matrix(matrice_final, divise_matrix((factorial(2 * i)), matrice2))
+        matrice, identity, matrice2 = matrix_identity(len_matrix)
+    return matrice_final
+
+def cos_function(len_matrix, matrice, matrice2, identity):
+    matrice_final = moins_matrix(divise_matrix(2, matrix_multiplication(matrice, matrice, len_matrix)), identity)
+    signe = 1
+    for n in range(2, 50):
+        j = 2
+        while j <= 2 * n:
+            matrice2 = matrix_multiplication(matrice2, matrice, len_matrix)
+            j += 1
+        matrice_final = plus_matrix(matrice_final, divise_matrix((factorial(2 * n)), mult_matrix(signe, matrice2)))
+        signe *= -1
+        matrice, identity, matrice2 = matrix_identity(len_matrix)
+    return matrice_final
+
+def sinh(len_matrix, matrice, matrice2):
+    matrice_final = mult_matrix(1, matrice)
+    for n in range(1, 50):
+        j = 2
+        while j <= 2 * n + 1:
+            matrice2 = matrix_multiplication(matrice2, matrice, len_matrix)
+            j += 1
+        matrice_final = plus_matrix(matrice_final, divise_matrix((factorial(2 * n + 1)), matrice2))
+        matrice, identity, matrice2 = matrix_identity(len_matrix)
+    return matrice_final
+
+def sin_function(len_matrix, matrice, matrice2, identity):
+    matrice_final = mult_matrix(1, matrice)
+    signe = -1
+    for n in range(1, 50):
+        j = 2
+        while j <= 2 * n + 1:
+            matrice2 = matrix_multiplication(matrice2, matrice, len_matrix)
+            j += 1
+        matrice_final = plus_matrix(matrice_final, divise_matrix((factorial(2 * n + 1)), mult_matrix(signe, matrice2)))
+        signe *= -1
+        matrice, identity, matrice2 = matrix_identity(len_matrix)
+    return matrice_final
+
+def main():
+    len_matrix = error()
+    matrice, identity, matrice2 = matrix_identity(len_matrix)
+    if (sys.argv[1] == "EXP"):
+        matrice_final = expo_function(len_matrix, matrice, matrice2, identity)
+    if (sys.argv[1] == "COS"):
+        matrice_final = cos_function(len_matrix, matrice, matrice2, identity)
+    if (sys.argv[1] == "COSH"):
+        matrice_final = cosh_function(len_matrix, matrice, matrice2, identity)
+    if (sys.argv[1] == "SINH"):
+        matrice_final = sinh(len_matrix, matrice, matrice2)
+    if (sys.argv[1] == "SIN"):
+        matrice_final = sin_function(len_matrix, matrice, matrice2, identity)
+    for i in range(len(matrice_final)):
+        for j in range(len(matrice_final)):
+            if (j + 1 != len(matrice_final)):
+                print(f"{matrice_final[i][j]:.2f}", end="\t")
+            else:
+                print(f"{matrice_final[i][j]:.2f}", end="\n")
+
+
+main()

@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+import sys
+from math import *
+
+
+def key_to_list(key):
+    key_vec = []
+    for i in range(len(key)):
+        key_vec.append(ord(key[i]))
+    if (4 > len(key) > 1):
+        for i in range(4 - len(key)):
+            key_vec.append(0)
+    if (9 > len(key) > 4):
+        for i in range(9 - len(key)):
+            key_vec.append(0)
+    if (16 > len(key) > 9):
+        for i in range(16 - len(key)):
+            key_vec.append(0)
+    return key_vec
+def key_matrice(key_vec, size):
+    key_vec_matrice = [[0 for _ in range(size)] for _ in range(size)]
+    k = 0
+    space = 0
+    print("Key matrix:")
+    for i in range(size):
+        for j in range(size):
+            key_vec_matrice[i][j] = key_vec[k]
+            if space + 1 != size:
+                print(key_vec[k], end="\t")
+            else:
+                print(key_vec[k])
+            space = space + 1
+            k += 1
+        space = 0
+    print()
+    return key_vec_matrice
+def message_to_list(message):
+    message_list = []
+    for i in range(len(message)):
+        message_list.append(ord(message[i]))
+    zero_plus = len(message) % 3
+    if (zero_plus == 0):
+        return message_list
+    for j in range(3 - zero_plus):
+        message_list.append(0)
+    return message_list
+
+def message_to_matrice(message_list, size_key):
+    size_y = int(len(message_list) / size_key)
+    message_matrice = [[0 for _ in range(size_key)] for _ in range(size_y)]
+    k = 0
+    for i in range(size_y):
+        for j in range(size_key):
+            message_matrice[i][j] = message_list[k]
+            k += 1
+    return message_matrice
+
+def matrix_multiplication(key, message):
+    matrix_final = [[0 for i in range(len(key))] for j in range(len(message))]
+    print("Encrypted message:")
+    for i in range(len(message)):
+        for j in range(len(key[0])):
+            for k in range(len(key)):
+                matrix_final[i][j] += message[i][k] * key[k][j]
+            if (j + 1 == len(key[0]) and i + 1 == len(message)):
+                print(matrix_final[i][j], end="")
+            elif (matrix_final[i][j] != 0):
+                print(matrix_final[i][j], end=" ")
+    print()
+    return (matrix_final)
+
+def string_to_matrix(str, num_columns):
+    numbers = str.split(" ")
+    num_rows = len(numbers) // num_columns
+    matrix = [[0 for j in range(num_columns)] for i in range(num_rows)]
+    matrix = [[int(numbers[i + j * num_columns]) for j in range(num_columns)] for i in range(num_rows)]
+    print(matrix)
+    return matrix
+
+def determinant(key_to_matrice):
+    total = 0
+    neg = 0
+    tmp = 1
+    tmpneg = 1
+    j = 0
+    for i in range(len(key_to_matrice)):
+        tmp *= key_to_matrice[i][j]
+        j += 1
+        if j >= len(key_to_matrice):
+            j = 0
+    total += tmp
+    j = 0
+    for i in range(len(key_to_matrice) - 1, -1, -1):
+        tmpneg *= key_to_matrice[i][j]
+        j += 1
+        if j >= len(key_to_matrice):
+            j = 0
+    neg -= tmpneg
+    return total + neg
+
+def reverse_matrix(total, key_to_matrice):
+    for i in range(len(key_to_matrice)):
+        for j in range(len(key_to_matrice)):
+            key_to_matrice[i][j] = key_to_matrice[i][j] / total
+    return key_to_matrice
+
+def rigor(av):
+    if (len(av) == 2 and av[1] == "-h"):
+        flagh(av)
+        print("""USAGE
+        ./103cipher message key flag
+    DESCRIPTION
+        message     a message, made of ASCII characters
+        key         the encryption key, made of ASCII characters
+        flag        0 for the message to be encrypted, 1 to be decrypted""")
+        sys.exit(0)
+    if (len(av) != 4 or av[3] != "0" and av[3] != "1"):
+        sys.stderr.write("Bad number of arguments.\n")
+        sys.exit(84)
+def cipher(av):
+    rigor(av)
+    key = av[2]
+    message = av[1]
+    size = int(ceil(sqrt(len(av[2]))))
+    key_to_matrice= key_matrice(key_to_list(key), size)
+    lenk = 0
+    for i in range(1):
+        for j in range(len(key_to_matrice[i])):
+            lenk = lenk + 1
+    if (av[3] == "0"):
+        message = message_to_matrice(message_to_list(message), lenk)
+        matrice = matrix_multiplication(key_to_matrice, message)
+        return 0
+    if (av[3] == "1"):
+        reversekey = reverse_matrix(determinant(key_to_matrice), key_to_matrice)
+        print(reversekey)
+        matrix = string_to_matrix(message, lenk)
+        return 0
+    return 0
+cipher(sys.argv)

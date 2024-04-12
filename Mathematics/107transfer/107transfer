@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+import sys
+import math
+import csv
+from math import *
+
+def error():
+    nb_star = 0
+    nb_num = 0
+    if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+        print(f"USAGE\n\t./107transfer [num den]+")
+        print(f"DESCRIPTION\n\tnum\tpolynomial numerator defined by its coefficients")
+        print(f"\tden\tpolynomial denominator defined by its coefficients")
+        sys.exit(0)
+    if (len(sys.argv) == 1 or (len(sys.argv) - 1) % 2 != 0):
+        sys.exit(84)
+
+def init_num_den(argument):
+    num = []
+    den = []
+
+    num = sys.argv[argument].split('*')
+    den = sys.argv[argument + 1].split('*')
+    for i in range(len(num)):
+        try:
+            num[i] = (int)(num[i])
+        except:
+            sys.exit(84)
+    for i in range(len(den)):
+        try:
+            den[i] = (int)(den[i])
+        except:
+            sys.exit(84)
+    return num, den
+
+def main():
+    error()
+    counter = 0
+    while (counter < 1.001):
+        more_argument = 1
+        saut = 1
+        while(saut < len(sys.argv)):
+            somme_num = 0
+            somme_den = 0
+            num, den = init_num_den(saut)
+            for i in range(len(num)):
+                somme_num += num[i] * counter ** i
+            if (len(den) != 1):
+                for i in range(len(den)):
+                    somme_den += den[i] * counter ** i
+            else:
+                somme_den = den[0]
+            saut += 2
+            if (somme_den == 0):
+                sys.exit(84)
+            more_argument *= (somme_num / somme_den)
+        print(f"{counter:.3f} -> {more_argument:.5f}")
+        counter += 0.001
+    return 0
+
+main()

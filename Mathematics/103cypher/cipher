@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+import sys
+from math import *
+
+def key_to_list(key):
+    key_vec = []
+    for i in range(len(key)):
+        key_vec.append(ord(key[i]))
+    if (4 > len(key) > 1):
+        for i in range(4 - len(key)):
+            key_vec.append(0)
+    if (9 > len(key) > 4):
+        for i in range(9 - len(key)):
+            key_vec.append(0)
+    return key_vec
+
+def key_matrice(key_vec):
+    size = int(sqrt(len(key_vec)))
+    key_vec_matrice = [[0 for _ in range(size)] for _ in range(size)]
+    k = 0
+    for i in range(size):
+        for j in range(size):
+            key_vec_matrice[i][j] = key_vec[k]
+            k += 1
+    return key_vec_matrice
+
+def message_to_list(message):
+    message_list = []
+    for i in range(len(message)):
+        message_list.append(ord(message[i]))
+    zero_plus = len(message) % 3
+    if (zero_plus == 0):
+        return message_list
+    for j in range(3 - zero_plus):
+        message_list.append(0)
+    return message_list
+
+def message_to_matrice(message_list, size_key):
+    size_y = int(len(message_list) / size_key)
+    message_matrice = [[0 for _ in range(size_key)] for _ in range(size_y)]
+    k = 0
+    for i in range(size_y):
+        for j in range(size_key):
+            message_matrice[i][j] = message_list[k]
+            k += 1
+    return message_matrice
+
+def matrix_multiplication(key, message):
+    matrix_final = [[0 for i in range(len(key[0]))] for j in range(len(message))]
+    for i in range(len(message)):
+        for j in range(len(key[0])):
+            for k in range(len(key)):
+                matrix_final[i][j] += message[i][k] * key[k][j]
+    return (matrix_final)
+
+def flagh(av):
+    print("""USAGE
+    ./103cipher message key flag
+DESCRIPTION
+    message     a message, made of ASCII characters
+    key         the encryption key, made of ASCII characters
+    flag        0 for the message to be encrypted, 1 to be decrypted""")
+    sys.exit(0)
+
+def cipher(av):
+    if (len(av) == 2):
+        flagh(av)
+    if len(av) != 4:
+        sys.stderr.write("Bad number of arguments.\n")
+        sys.exit(84)
+    key = av[2]
+    message = av[1]
+    key_to_matrice= key_matrice(key_to_list(key))
+    lenk = 0
+    for i in range(1):
+        for j in range(len(key_to_matrice[i])):
+            lenk = lenk + 1
+    if (av[3] == "0"):
+        message = message_to_matrice(message_to_list(message), lenk)
+        matrice = matrix_multiplication(key_to_matrice, message)
+        print(matrice)
+        return 0
+    if (av[3] == "1"):
+        print(av[1])
+        return 0
+    return 0
+cipher(sys.argv)
